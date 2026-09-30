@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spider Clock</title>
+<style>
+:root{--bg:#e9e1d0;--f1:#faf5e8;--f2:#d6cbb2;--web:#7a7568;--ink:#1c1a17;--badge:#f3ecdb;--hr:#d18a00;--min:#1e6fd9;--sec:#d32f2f;--leg:#2b1c13;--leghl:#8a6244;--rust:#b0592c;--bhl:#7a4f33;--bdk:#160d08;--cream:#e8cf9f;--dew:rgba(255,255,255,.55);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#07080c;--f1:#1c2030;--f2:#080910;--web:#a9b1c7;--ink:#f0eef7;--badge:#151826;--hr:#ffc247;--min:#5aa9ff;--sec:#ff5252;--leg:#6a4a35;--leghl:#d1a27a;--rust:#e08a52;--bhl:#b07c58;--bdk:#3f2a1c;--dew:rgba(200,225,255,.4)}}
+:root[data-theme="dark"]{--bg:#07080c;--f1:#1c2030;--f2:#080910;--web:#a9b1c7;--ink:#f0eef7;--badge:#151826;--hr:#ffc247;--min:#5aa9ff;--sec:#ff5252;--leg:#6a4a35;--leghl:#d1a27a;--rust:#e08a52;--bhl:#b07c58;--bdk:#3f2a1c;--dew:rgba(200,225,255,.4)}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'Segoe UI',Arial,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+svg{width:min(94vw,76vh,580px);height:auto}
+.web{fill:none;stroke:var(--web);stroke-width:.9;opacity:.6}
+.tk{stroke:var(--ink);opacity:.55}
+.num{fill:var(--ink);font:700 16px Georgia,'Times New Roman',serif;text-anchor:middle;dominant-baseline:central}
+.leg{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.legend{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 18px;font-size:14px}
+.legend i,.btn i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.legend[hidden]{display:none}
+.legend{background:var(--badge);border:1px solid var(--web);border-radius:14px;padding:12px 16px;max-width:92vw}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:10px 18px;border-radius:999px;border:1px solid var(--web);background:var(--badge);color:var(--ink);font:600 14px system-ui,-apple-system,'Segoe UI',Arial,sans-serif;cursor:pointer;transition:transform .15s}
+.btn:hover{transform:translateY(-1px)}.btn:active{transform:scale(.97)}.btn:focus-visible{outline:2px solid var(--min);outline-offset:2px}
+.btn i{margin:0 -4px 0 0}.btn .ch{transition:transform .2s;font-size:11px}.btn[aria-expanded=true] .ch{transform:rotate(180deg)}
+</style>
+</head>
+<body>
+<svg viewBox="-200 -200 400 400" role="img" aria-label="Realistic spider clock showing the current time">
+  <defs>
+    <radialGradient id="face" cx="50%" cy="45%" r="60%"><stop offset="0" style="stop-color:var(--f1)"/><stop offset="1" style="stop-color:var(--f2)"/></radialGradient>
+    <radialGradient id="gAb" cx="40%" cy="35%" r="70%"><stop offset="0" style="stop-color:var(--bhl)"/><stop offset="1" style="stop-color:var(--bdk)"/></radialGradient>
+    <filter id="fur" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="4"/></filter>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="2" dy="6" stdDeviation="4" flood-color="#000" flood-opacity=".42"/></filter>
+  </defs>
+  <circle r="199" fill="url(#face)" stroke="var(--web)" stroke-width="2"/>
+  <g id="web" class="web"></g>
+  <g id="dew"></g>
+  <g id="ticks"></g>
+  <g id="nums"></g>
+  <g filter="url(#shadow)">
+    <g id="idle" opacity=".8"></g>
+    <g id="hands"></g>
+    <circle id="ht" r="9" fill="var(--hr)"/>
+    <circle id="mt" r="7" fill="var(--min)"/>
+    <circle id="st" r="5" fill="var(--sec)"/>
+    <g transform="scale(1.22)">
+      <g id="abd"><g filter="url(#fur)">
+        <ellipse cx="0" cy="18" rx="17" ry="25" fill="url(#gAb)"/>
+        <ellipse cx="0" cy="18" rx="18.5" ry="26.5" fill="none" stroke="var(--bhl)" stroke-width="3" stroke-dasharray=".6 1.1" opacity=".55"/>
+        <g fill="var(--cream)" opacity=".85">
+          <ellipse cx="0" cy="8" rx="3.2" ry="4"/><ellipse cx="0" cy="19" rx="3" ry="3.6"/><ellipse cx="0" cy="29" rx="2.4" ry="3"/>
+          <ellipse cx="-8" cy="14" rx="2" ry="2.6"/><ellipse cx="8" cy="14" rx="2" ry="2.6"/><ellipse cx="-7" cy="26" rx="1.6" ry="2.2"/><ellipse cx="7" cy="26" rx="1.6" ry="2.2"/>
+        </g>
+      </g><ellipse cx="-6" cy="8" rx="4" ry="9" fill="#fff" opacity=".1" transform="rotate(12 -6 8)"/></g>
+      <g stroke="var(--leg)" stroke-width="2.8" stroke-linecap="round" fill="none"><path d="M-5 -19 L-8 -27 L-4 -33"/><path d="M5 -19 L8 -27 L4 -33"/></g>
+      <g filter="url(#fur)"><ellipse cx="0" cy="-8" rx="12.5" ry="14" fill="url(#gAb)"/>
+        <ellipse cx="0" cy="-8" rx="14" ry="15.5" fill="none" stroke="var(--rust)" stroke-width="3" stroke-dasharray=".6 1.1" opacity=".5"/></g>
+      <ellipse cx="-3" cy="-13" rx="4" ry="6" fill="#fff" opacity=".12"/>
+      <g fill="var(--leg)"><ellipse cx="-3.6" cy="-22" rx="2.6" ry="4"/><ellipse cx="3.6" cy="-22" rx="2.6" ry="4"/></g>
+      <g fill="#0b0b0b" stroke="var(--leghl)" stroke-width=".4">
+        <circle cx="-3.8" cy="-17.5" r="2.2"/><circle cx="3.8" cy="-17.5" r="2.2"/><circle cx="-7" cy="-14.5" r="1.6"/><circle cx="7" cy="-14.5" r="1.6"/>
+        <circle cx="-2.8" cy="-14.2" r="1.3"/><circle cx="2.8" cy="-14.2" r="1.3"/><circle cx="-5.5" cy="-11.5" r="1.1"/><circle cx="5.5" cy="-11.5" r="1.1"/>
+      </g>
+      <g fill="#fff" opacity=".85"><circle cx="-4.4" cy="-18.2" r=".6"/><circle cx="3.2" cy="-18.2" r=".6"/></g>
+    </g>
+  </g>
+</svg>
+<button id="lb" class="btn" aria-expanded="false" aria-controls="lg"><span><i style="background:var(--hr)"></i><i style="background:var(--min)"></i><i style="background:var(--sec)"></i></span>How to read the clock<span class="ch">&#9660;</span></button>
+<div class="legend" id="lg" hidden>
+  <span><i style="background:var(--hr)"></i>Hours: short, thick leg</span>
+  <span><i style="background:var(--min)"></i>Minutes: long leg</span>
+  <span><i style="background:var(--sec)"></i>Seconds: thin leg, steps each second</span>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+$('lb').onclick=()=>{const o=$('lg').hidden;$('lg').hidden=!o;$('lb').setAttribute('aria-expanded',o)};
+const R=Math.PI/180,NS='http://www.w3.org/2000/svg';
+// spiral orb web with sagging threads + dew drops
+let w='',dw='';
+for(let i=0;i<12;i++){const a=(i*30-90)*R;w+=`<line x1="0" y1="0" x2="${150*Math.cos(a)}" y2="${150*Math.sin(a)}"/>`}
+let d='';const N=84,rad=k=>22+k*(128/N);
+for(let k=0;k<N;k++){const a=(k*30-90)*R,b=((k+1)*30-90)*R,m=(a+b)/2,c=(rad(k)+rad(k+1))/2*.94;
+  if(!k)d+=`M${rad(0)*Math.cos(a)} ${rad(0)*Math.sin(a)}`;
+  d+=`Q${c*Math.cos(m)} ${c*Math.sin(m)} ${rad(k+1)*Math.cos(b)} ${rad(k+1)*Math.sin(b)}`;
+  if(k>6&&(k*7)%5===0){const s=1.6+((k*13)%5)*.35,x=rad(k+1)*Math.cos(b),y=rad(k+1)*Math.sin(b);
+    dw+=`<circle cx="${x}" cy="${y}" r="${s}" fill="var(--dew)" stroke="var(--web)" stroke-width=".4"/><circle cx="${x-s*.3}" cy="${y-s*.3}" r="${s*.3}" fill="#fff" opacity=".9"/>`}}
+$('web').innerHTML=w+`<path d="${d}"/>`;$('dew').innerHTML=dw;
+let t='',n='';
+for(let i=0;i<60;i++){const a=(i*6-90)*R,r1=i%5?188:182;
+  t+=`<line class="tk" stroke-width="${i%5?1:2.5}" x1="${r1*Math.cos(a)}" y1="${r1*Math.sin(a)}" x2="${195*Math.cos(a)}" y2="${195*Math.sin(a)}"/>`}
+for(let i=1;i<=12;i++){const a=(i*30-90)*R,x=165*Math.cos(a),y=165*Math.sin(a);
+  n+=`<circle cx="${x}" cy="${y}" r="13" fill="var(--badge)" stroke="var(--web)" stroke-width="1"/><text class="num" x="${x}" y="${y+.5}">${i}</text>`}
+$('ticks').innerHTML=t;$('nums').innerHTML=n;
+// jointed, tapered, hairy leg; rust knee bands; optional colored tip segment
+function mkLeg(layer,ws,tip){
+  return ws.map((sw,i)=>{
+    const mk=(s,col,ex)=>{const p=document.createElementNS(NS,'path');p.setAttribute('class','leg');p.setAttribute('stroke-width',s);p.style.stroke=col;for(const k in ex)p.setAttribute(k,ex[k]);layer.appendChild(p);return p};
+    const base=(i==2&&tip)?tip:'var(--leg)';
+    return [mk(sw*2.3,'var(--leg)',{'stroke-dasharray':'.6 1.7',opacity:.55}),mk(sw,base,{}),mk(sw*.3,i==0?'var(--rust)':'var(--leghl)',{opacity:.65})];
+  });
+}
+function setLeg(segs,deg,len,sign){
+  const a=deg*R,dx=Math.sin(a),dy=-Math.cos(a),px=Math.cos(a),py=Math.sin(a),b=len*.17*sign;
+  const P=[[0,0],[dx*len*.3+px*b,dy*len*.3+py*b],[dx*len*.64+px*b*.3,dy*len*.64+py*b*.3],[dx*len,dy*len]];
+  segs.forEach((ls,i)=>{const s=`M${P[i][0]} ${P[i][1]}L${P[i+1][0]} ${P[i+1][1]}`;ls.forEach(p=>p.setAttribute('d',s))});
+  return P[3];
+}
+const idleBase=[38,108,160,252,312];
+const idleLegs=idleBase.map(()=>{const g=document.createElementNS(NS,'g');$('idle').appendChild(g);return mkLeg(g,[6.5,5,3.4])});
+const gs=[0,1,2].map(()=>{const g=document.createElementNS(NS,'g');$('hands').appendChild(g);return g});
+const hL=mkLeg(gs[0],[13,10,7.5],'var(--hr)'),mL=mkLeg(gs[1],[9.5,7,5],'var(--min)'),sL=mkLeg(gs[2],[4,3,2.2],'var(--sec)');
+const back=x=>1+2.70158*Math.pow(x-1,3)+1.70158*Math.pow(x-1,2); // overshoot "step"
+function put(id,p){$(id).setAttribute('cx',p[0]);$(id).setAttribute('cy',p[1])}
+function tick(){
+  const dt=new Date(),s=dt.getSeconds()+dt.getMilliseconds()/1000,m=dt.getMinutes()+s/60,h=dt.getHours()%12+m/60;
+  const f=s%1,step=Math.floor(s)+(f<.3?back(f/.3):1);
+  put('ht',setLeg(hL,h*30,80,-1));put('mt',setLeg(mL,m*6,128,-1));put('st',setLeg(sL,step*6,152,1));
+  const k=performance.now()/1000;
+  idleLegs.forEach((l,i)=>setLeg(l,idleBase[i]+Math.sin(k*2+i*1.7)*8,54,i%2?-1:1));
+  const br=1+Math.sin(k*1.6)*.02;
+  $('abd').setAttribute('transform',`translate(0 -4) scale(1 ${br}) translate(0 4)`);
+  requestAnimationFrame(tick);
+}
+tick();
+</script>
+</body>
+</html>
